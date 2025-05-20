@@ -121,7 +121,6 @@ class TotoBackbone(torch.nn.Module):
         )
         self.unembed = torch.nn.Linear(embed_dim, embed_dim * patch_size)
 
-        # TODO[BEN] this doesn't need to be a list
         output_distribution_classes_ = [DISTRIBUTION_CLASSES_LOOKUP[c] for c in output_distribution_classes]
         self.output_distribution = output_distribution_classes_[0](embed_dim, **(output_distribution_kwargs or {}))
 

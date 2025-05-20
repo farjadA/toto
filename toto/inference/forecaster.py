@@ -206,7 +206,6 @@ class TotoForecaster:
         start_index = inputs.shape[-1]
         end_index = start_index + prediction_length
 
-        # TODO: maybe pass in future masks, rather than making assumptions here?
         dummy_padding = torch.ones(
             (input_padding_mask.shape[0], input_padding_mask.shape[1], patch_size),
             device=inputs.device,

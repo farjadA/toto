@@ -13,7 +13,6 @@ def download_boom_benchmark(local_path: str) -> str:
     Returns:
         str: Path to the downloaded dataset folder.
     """
-    # TODO(salahidine): Change the path to anonymous s3 bucket
     repo_id = "Datadog/BOOM"
     dataset_dir = os.path.join(local_path, "boom_benchmark")
 

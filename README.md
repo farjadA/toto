@@ -153,7 +153,6 @@ For example evaluations of different time series models on the BOOM dataset, see
 
 If you use Toto in your research, please cite our work:
 
-TODO: add arxiv BibTeX
 
 ## License
 Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License - see [LICENSE](LICENSE) file for details.
