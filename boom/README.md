@@ -1,12 +1,10 @@
 # BOOM (Benchmark of Observability Metrics) Evaluations
 
-This directory contains example code for evaluating zero-shot foundation models as well as classical baselines against BOOM. For more information on the dataset, see the [dataset card](https://huggingface.co/datasets/Datadog/BOOM) in Hugging Face.
-
+This directory contains example code for evaluating zero-shot foundation models as well as classical baselines against BOOM.
 To run evals for Toto, make sure you've followed the installation instructions in this repository.
 
 ## Models
 
-- [Toto (this repository)](https://github.com/DataDog/toto)
 - [Chronos](https://github.com/amazon-science/chronos-forecasting)
 - [Moirai](https://github.com/SalesforceAIResearch/uni2ts)
 - [TimesFM](https://github.com/google-research/timesfm)
