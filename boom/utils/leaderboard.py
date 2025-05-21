@@ -106,7 +106,7 @@ def load_and_process_csv(path, light_benchmark=False):
     df["full_dataset_name"] = df["dataset"]
     df["dataset"] = df["dataset"].str.split("/").str[0]
     if light_benchmark:
-        light_benchmark_datasets = json.load(open("dataset_properties_light.json")).keys()
+        light_benchmark_datasets = json.load(open("boomlet_properties.json")).keys()
         df = df[df["dataset"].isin(light_benchmark_datasets)]
     return df
 
