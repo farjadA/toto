@@ -31,21 +31,12 @@ This repository also hosts the code for evaluating time series models on BOOM (*
 - **Pre-trained on Massive Data**: Trained on over 2 trillion time series data points, the largest pretraining dataset for any open-weights time series foundation model to date.
 
 
-### Model Weights
-
-Toto-Open, the open-weights release of Toto, is available on Hugging Face. Currently available checkpoints:
-
-| Checkpoint | Parameters | Notes |
-|------------|------------|-------|
-| **Toto** | 151M | The initial open relase of Toto. Achieves state-of-the-art performance on both general-purpose and observability-focused benchmarking tasks, as described in our paper. |
-
-
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/DataDog/toto.git
+unzip -q <CHANGE ME TO ZIP NAME>
 cd toto
 
 # Optional: create a virtual environment
@@ -54,6 +45,9 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Download locally Toto chekpoint and BOOM files
+python toto/download_artifacts.py    
 ```
 For optimal inference speed, it's recommended to install [xformers](https://github.com/facebookresearch/xformers?tab=readme-ov-file#installing-xformers) and [flash-attention](https://github.com/Dao-AILab/flash-attention?tab=readme-ov-file#installation-and-features) as well.
 
@@ -66,9 +60,10 @@ import torch
 from data.util.dataset import MaskedTimeseries
 from inference.forecaster import TotoForecaster
 from model.toto import Toto
+from global_settings import LOCAL_MODEL_DIR
 
 # Load the pre-trained model
-toto = Toto.from_pretrained('Datadog/Toto-Open-Base-1.0')
+toto = Toto.from_pretrained(LOCAL_MODEL_DIR)
 toto.to('cuda')  # Move to GPU
 
 # Optionally compile the model for faster inference
