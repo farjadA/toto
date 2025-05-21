@@ -1,7 +1,5 @@
 # Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
-#
-# This product includes software developed at Datadog (https://www.datadoghq.com/)
-# Copyright 2025 Datadog, Inc.
+
 
 """
 This script evaluates a TOTO model on LSF datasets using a specified checkpoint dir path or model id.
@@ -14,7 +12,7 @@ python toto/evaluation/run_lsf_eval.py \
     --datasets ETTh1 \
     --context-length 2048 \
     --eval-stride 1 \
-    --checkpoint-path [CHECKPOINT-NAME-OR-DIR]
+    --checkpoint-path [CHECKPOINT-NAME-OR-DIR]      # By default, it will use the local model dir from global_settings.py
 """
 
 import argparse
@@ -27,6 +25,7 @@ import numpy as np
 import pandas as pd
 import torch
 from tabulate import tabulate
+from global_settings import LOCAL_MODEL_DIR
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -128,9 +127,8 @@ def get_parser():
     parser.add_argument(
         "--checkpoint-path",
         type=str,
-        default="Datadog/Toto-Open-Base-1.0",
-        help="Either the `model_id` (string) of a model hosted on the Hub, e.g. `bigscience/bloom`."
-        "Or a path to a `directory` containing model weights saved using [`~transformers.PreTrainedModel.save_pretrained`], e.g., `../path/to/my_model_directory/`.",
+        default=LOCAL_MODEL_DIR,
+        help="path to the checkpoint directory locally after downloading the artifacts (download_artifacts.py).",
     )
 
     return parser
