@@ -30,7 +30,6 @@
 "cffi","https://github.com/python-cffi/cffi","['MIT']","['Maciej Fijalkowski', 'Armin Rigo']"
 "charset-normalizer","https://github.com/jawah/charset_normalizer","['MIT']","['TAHRI Ahmed R.']"
 "click","https://github.com/pallets/click/","['BSD-3-Clause']","['Pallets']"
-"com.github.DataDog/toto","git+https://github.com/DataDog/toto","['Apache-2.0']","['Datadog, Inc.']"
 "comm","https://github.com/ipython/comm","['BSD 3-Clause License']","['Jupyter Development Team']"
 "contourpy","https://github.com/contourpy/contourpy","['BSD-3-Clause']","['ContourPy Developers']"
 "cycler","pypi:cycler","['BSD-3-Clause']","['matplotlib project']"
