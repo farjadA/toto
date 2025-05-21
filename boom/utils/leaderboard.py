@@ -101,18 +101,18 @@ def shifted_gmean(x, epsilon=1e-5, dim=-1):
     n = x.shape[dim]
     return np.exp(logsum / n) - epsilon
 
-def load_and_process_csv(path, light_benchmark=False):
+def load_and_process_csv(path, boomlet_benchmark):
     df = pd.read_csv(path)
     df["full_dataset_name"] = df["dataset"]
     df["dataset"] = df["dataset"].str.split("/").str[0]
-    if light_benchmark:
+    if boomlet_benchmark:
         light_benchmark_datasets = json.load(open("boomlet_properties.json")).keys()
         df = df[df["dataset"].isin(light_benchmark_datasets)]
     return df
 
-def load_model_results(models_dir):
+def load_model_results(models_dir, boomlet_benchmark):
     model_names = [d for d in os.listdir(models_dir) if os.path.isdir(os.path.join(models_dir, d))]
-    dfs = [load_and_process_csv(os.path.join(models_dir, m, "all_results.csv")) for m in model_names]
+    dfs = [load_and_process_csv(os.path.join(models_dir, m, "all_results.csv"), boomlet_benchmark) for m in model_names]
 
     assert "seasonalnaive" in model_names, "seasonalnaive model must be present in models directory"
     
