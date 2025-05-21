@@ -34,6 +34,13 @@ This repository also hosts the code for evaluating time series models on BOOM (*
 - **Decoder-Only Architecture**: Support for variable prediction horizons and context lengths
 - **Pre-trained on Massive Data**: Trained on over 2 trillion time series data points, the largest pretraining dataset for any open-weights time series foundation model to date.
 
+### Model Weights
+
+Toto-Open, the open-weights release of Toto, is available on this [public bucket](https://origin-static-assets.s3.us-east-1.amazonaws.com/download/Toto-Open-Base-1.0.zip). Currently available checkpoints:
+
+| Checkpoint | Parameters | Notes |
+|------------|------------|-------|
+| [Toto-Open-Base-1.0](https://huggingface.co/Datadog/Toto-Open-Base-1.0) | 151M | The initial open relase of Toto. Achieves state-of-the-art performance on both general-purpose and observability-focused benchmarking tasks, as described in our paper. |
 
 
 ### Installation
@@ -205,11 +212,15 @@ To reproduce our results on the GIFT-Eval benchmark, we provide a dedicated note
 ## BOOM (Benchmark of Observability Metrics)
 
 **BOOM** (**B**enchmark **o**f **O**bservability **M**etrics) is a large-scale, real-world time series dataset designed for evaluating models on forecasting tasks in complex observability environments.
-Composed of real-world metrics data, and captures the irregularity, structural complexity, and heavy-tailed statistics typical of production observability data. Unlike synthetic or curated benchmarks, BOOM reflects the full diversity and unpredictability of operational signals observed in distributed systems, covering infrastructure, networking, databases, security, and application-level metrics.
+Composed of real-world metrics data, and captures the irregularity, structural complexity, and heavy-tailed statistics typical of production observability data. 
 
-Note: the metrics comprising BOOM were generated from internal monitoring of pre-production environments, and **do not** include any customer data. 
+Unlike synthetic or curated benchmarks, **BOOM** reflects the full diversity and unpredictability of operational signals observed in distributed systems, spanning infrastructure, networking, databases, security, and application-level metrics.
 
-For example evaluations of different time series models on the BOOM dataset, see the [boom](boom) folder in this repository.
+> **Note:** The metrics comprising **BOOM** were collected from internal monitoring of pre-production environments and **do not** include any customer data.
+
+For example evaluations of time series models on the **BOOM** dataset, see the [`boom`](boom) folder in this repository.
+
+All **BOOM** datasets are available from this [public S3 bucket](https://origin-static-assets.s3.us-east-1.amazonaws.com/download/BOOM.zip).
 
 ## Citation
 
