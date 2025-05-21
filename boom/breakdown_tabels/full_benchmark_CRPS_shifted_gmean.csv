@@ -8,7 +8,8 @@ moirai_1.1_base,0.428
 moirai_1.1_large,0.436
 moirai_1.1_small,0.442
 seasonalnaive,1.0
-time-moe,0.649
+time-moe-200M,0.643
+time-moe-50M,0.649
 timer,0.639
 timesfm_2_0_500m,0.447
 toto,0.375
