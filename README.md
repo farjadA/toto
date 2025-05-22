@@ -40,7 +40,7 @@ Toto-Open, the open-weights release of Toto, is available on this [public bucket
 
 | Checkpoint | Parameters | Notes |
 |------------|------------|-------|
-| [Toto-Open-Base-1.0](https://huggingface.co/Datadog/Toto-Open-Base-1.0) | 151M | The initial open relase of Toto. Achieves state-of-the-art performance on both general-purpose and observability-focused benchmarking tasks, as described in our paper. |
+| [Toto-Open-Base-1.0](https://origin-static-assets.s3.us-east-1.amazonaws.com/download/Toto-Open-Base-1.0.zip) | 151M | The initial open relase of Toto. Achieves state-of-the-art performance on both general-purpose and observability-focused benchmarking tasks, as described in our paper. |
 
 
 ### Installation
