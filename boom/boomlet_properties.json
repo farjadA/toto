@@ -7,9 +7,7 @@
         "frequency": "Short",
         "num_variates": 33,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-22-10S": {
         "domain": [
@@ -18,9 +16,7 @@
         "frequency": "Short",
         "num_variates": 50,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-35-10S": {
         "domain": [
@@ -29,9 +25,7 @@
         "frequency": "Short",
         "num_variates": 90,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-189-10S": {
         "domain": [
@@ -40,9 +34,7 @@
         "frequency": "Short",
         "num_variates": 55,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-285-T": {
         "domain": [
@@ -51,9 +43,7 @@
         "frequency": "Short",
         "num_variates": 75,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-374-10S": {
         "domain": [
@@ -62,9 +52,7 @@
         "frequency": "Short",
         "num_variates": 50,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-413-10S": {
         "domain": [
@@ -73,9 +61,7 @@
         "frequency": "Short",
         "num_variates": 33,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-496-10S": {
         "domain": [
@@ -85,9 +71,7 @@
         "frequency": "Short",
         "num_variates": 36,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-619-T": {
         "domain": [
@@ -96,9 +80,7 @@
         "frequency": "Short",
         "num_variates": 52,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-772-T": {
         "domain": [
@@ -107,9 +89,7 @@
         "frequency": "Short",
         "num_variates": 67,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-833-10S": {
         "domain": [
@@ -118,9 +98,7 @@
         "frequency": "Short",
         "num_variates": 24,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-957-10S": {
         "domain": [
@@ -129,9 +107,7 @@
         "frequency": "Short",
         "num_variates": 26,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-963-T": {
         "domain": [
@@ -140,9 +116,7 @@
         "frequency": "Short",
         "num_variates": 28,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1062-5T": {
         "domain": [
@@ -151,9 +125,7 @@
         "frequency": "Short",
         "num_variates": 21,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1170-10S": {
         "domain": [
@@ -163,9 +135,7 @@
         "frequency": "Short",
         "num_variates": 31,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1209-5T": {
         "domain": [
@@ -174,9 +144,7 @@
         "frequency": "Short",
         "num_variates": 53,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1225-T": {
         "domain": [
@@ -185,9 +153,7 @@
         "frequency": "Short",
         "num_variates": 49,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1230-5T": {
         "domain": [
@@ -196,9 +162,7 @@
         "frequency": "Short",
         "num_variates": 23,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1280-10S": {
         "domain": [
@@ -207,9 +171,7 @@
         "frequency": "Short",
         "num_variates": 35,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1282-T": {
         "domain": [
@@ -218,9 +180,7 @@
         "frequency": "Short",
         "num_variates": 35,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1289-10S": {
         "domain": [
@@ -229,9 +189,7 @@
         "frequency": "Short",
         "num_variates": 42,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1309-10S": {
         "domain": [
@@ -240,9 +198,7 @@
         "frequency": "Short",
         "num_variates": 38,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1324-10S": {
         "domain": [
@@ -251,9 +207,7 @@
         "frequency": "Short",
         "num_variates": 41,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1400-10S": {
         "domain": [
@@ -262,9 +216,7 @@
         "frequency": "Short",
         "num_variates": 75,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1487-5T": {
         "domain": [
@@ -273,9 +225,7 @@
         "frequency": "Short",
         "num_variates": 54,
         "term": "long",
-        "type": [
-            "distribution"
-        ]
+        "type": "distribution"
     },
     "ds-1520-10S": {
         "domain": [
@@ -284,9 +234,7 @@
         "frequency": "Short",
         "num_variates": 80,
         "term": "long",
-        "type": [
-            "count"
-        ]
+        "type": "count"
     },
     "ds-1564-10S": {
         "domain": [
@@ -295,9 +243,7 @@
         "frequency": "Short",
         "num_variates": 64,
         "term": "long",
-        "type": [
-            "rate"
-        ]
+        "type": "rate"
     },
     "ds-1631-30T": {
         "domain": [
@@ -306,9 +252,7 @@
         "frequency": "Short",
         "num_variates": 40,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1676-30T": {
         "domain": [
@@ -317,9 +261,7 @@
         "frequency": "Short",
         "num_variates": 100,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1855-H": {
         "domain": [
@@ -328,9 +270,7 @@
         "frequency": "Medium",
         "num_variates": 52,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-1975-H": {
         "domain": [
@@ -339,9 +279,7 @@
         "frequency": "Medium",
         "num_variates": 75,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     },
     "ds-2187-H": {
         "domain": [
@@ -350,8 +288,6 @@
         "frequency": "Medium",
         "num_variates": 100,
         "term": "long",
-        "type": [
-            "gauge"
-        ]
+        "type": "gauge"
     }
 }
