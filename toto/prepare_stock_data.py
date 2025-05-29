@@ -56,21 +56,48 @@ def fetch_sp500_data(lookback_days=700):
 
 def prepare_for_toto(data, device='cpu'):
     """
-    Prepare the data in the format Toto expects
+    Prepare the data in the format Toto expects with robust normalization
     """
     # Normalize each feature
     normalized_data = {}
     for column in data.columns:
         series = data[column].values
-        mean = np.mean(series)
-        std = np.std(series)
-        normalized_data[column] = (series - mean) / (std if std > 0 else 1)
+        
+        # Handle special cases for different features
+        if column in ['Volume', 'Volume_MA']:
+            # Log transform volume data to handle large numbers
+            series = np.log1p(series)
+        elif column == 'Volatility':
+            # Ensure volatility is non-negative
+            series = np.maximum(series, 0)
+        
+        # Robust normalization
+        q1 = np.percentile(series[~np.isnan(series)], 25)
+        q3 = np.percentile(series[~np.isnan(series)], 75)
+        iqr = q3 - q1
+        
+        if iqr > 0:
+            # Use robust statistics for normalization
+            median = np.median(series[~np.isnan(series)])
+            normalized_data[column] = (series - median) / (iqr + 1e-8)
+        else:
+            # Fallback to simple standardization with safeguards
+            mean = np.mean(series[~np.isnan(series)])
+            std = np.std(series[~np.isnan(series)])
+            normalized_data[column] = (series - mean) / (std + 1e-8)
+        
+        # Clip extreme values
+        normalized_data[column] = np.clip(normalized_data[column], -10, 10)
     
     # Convert to tensor format and move to device
     series_tensor = torch.tensor(
         np.array([normalized_data[col] for col in data.columns]),
         dtype=torch.float32
     ).to(device)
+    
+    # Validate tensor for any remaining issues
+    if torch.isnan(series_tensor).any() or torch.isinf(series_tensor).any():
+        raise ValueError("Invalid values detected in normalized data")
     
     # Create timestamp tensor (seconds since start)
     timestamps = pd.to_datetime(data.index)
