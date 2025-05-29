@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 import numpy as np
 import sys
 from pathlib import Path
+from fredapi import Fred
+from textblob import TextBlob
+import requests
+from typing import Optional, Tuple
 
 # Add the parent directory to the Python path
 root_dir = Path(__file__).parent.parent
@@ -227,6 +231,141 @@ def denormalize_predictions(predictions, normalization_params, column_names):
         denormalized = denormalized.transpose(0, 2, 3, 1)  # -> [batch, variables, prediction_length, samples]
     
     return denormalized
+
+def fetch_vix_data(start_date: str, end_date: str) -> pd.Series:
+    """
+    Fetch VIX data from Yahoo Finance
+    """
+    try:
+        vix = yf.download('^VIX', start=start_date, end=end_date, interval='1d')
+        if vix.empty:
+            empty_series = pd.Series(dtype=float)
+            empty_series.name = 'VIX'
+            return empty_series
+            
+        vix_series = vix['Close'].resample('1D').last()
+        vix_series.name = 'VIX'  # Set name attribute directly
+        return vix_series
+        
+    except Exception as e:
+        print(f"Error fetching VIX data: {e}")
+        empty_series = pd.Series(dtype=float)
+        empty_series.name = 'VIX'
+        return empty_series
+
+def fetch_fred_data(api_key: str, start_date: str, end_date: str) -> pd.DataFrame:
+    """
+    Fetch economic indicators from FRED
+    Required: pip install fredapi
+    """
+    fred = Fred(api_key=api_key)
+    
+    # Fetch various economic indicators
+    indicators = {
+        'T10Y2Y': 'Treasury_Spread',  # 10-Year Treasury Constant Maturity Minus 2-Year
+        'UNRATE': 'Unemployment_Rate',  # Unemployment Rate
+        'CPIAUCSL': 'CPI',  # Consumer Price Index
+        'DFF': 'Fed_Funds_Rate',  # Effective Federal Funds Rate
+    }
+    
+    df_list = []
+    for series_id, name in indicators.items():
+        data = fred.get_series(series_id, start_date, end_date)
+        data = data.resample('1D').ffill()  # Forward fill missing values
+        data = data.rename(name)
+        df_list.append(data)
+    
+    fred_data = pd.concat(df_list, axis=1)
+    return fred_data
+
+def fetch_fear_greed_index() -> pd.DataFrame:
+    """
+    Fetch CNN Fear & Greed Index
+    Note: This is a simplified version using the API
+    """
+    url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+    response = requests.get(url)
+    data = response.json()
+    
+    df = pd.DataFrame(data['fear_and_greed_historical']['data'])
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df = df.set_index('timestamp')
+    df = df['score'].rename('Fear_Greed_Index')
+    return df
+
+def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate additional technical indicators
+    """
+    # RSI
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    rs = gain / loss
+    df['RSI'] = 100 - (100 / (1 + rs))
+    
+    # Bollinger Bands
+    df['BB_middle'] = df['Close'].rolling(window=20).mean()
+    df['BB_upper'] = df['BB_middle'] + 2 * df['Close'].rolling(window=20).std()
+    df['BB_lower'] = df['BB_middle'] - 2 * df['Close'].rolling(window=20).std()
+    
+    # MACD
+    exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+    exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+    df['MACD'] = exp1 - exp2
+    df['Signal_Line'] = df['MACD'].ewm(span=9, adjust=False).mean()
+    
+    return df
+
+def fetch_sp500_data_enhanced(symbol: str = '^GSPC', 
+                            lookback_days: int = 700,
+                            fred_api_key: Optional[str] = '128bca4606e010551f39ab901271f39e') -> pd.DataFrame:
+    """
+    Enhanced version of fetch_sp500_data that includes additional features
+    """
+    # Calculate start and end dates
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=lookback_days)
+    
+    # Format dates as strings
+    start_date_str = start_date.strftime('%Y-%m-%d')
+    end_date_str = end_date.strftime('%Y-%m-%d')
+    
+    # Fetch base S&P 500 data
+    df = fetch_sp500_data(lookback_days=lookback_days)
+    
+    # Add technical indicators
+    df = calculate_technical_indicators(df)
+    
+    # Add VIX data
+    try:
+        vix_data = fetch_vix_data(start_date_str, end_date_str)
+        if not vix_data.empty:
+            df = df.join(vix_data)
+    except Exception as e:
+        print(f"Could not fetch VIX data: {e}")
+    
+    # Add Fear & Greed Index
+    try:
+        fear_greed = fetch_fear_greed_index()
+        if not fear_greed.empty:
+            df = df.join(fear_greed)
+    except Exception as e:
+        print(f"Could not fetch Fear & Greed Index: {e}")
+    
+    # Add FRED data if API key is provided
+    if fred_api_key:
+        try:
+            fred_data = fetch_fred_data(fred_api_key, start_date_str, end_date_str)
+            if not fred_data.empty:
+                df = df.join(fred_data)
+        except Exception as e:
+            print(f"Could not fetch FRED data: {e}")
+    
+    # Forward fill any missing values
+    df = df.ffill()
+    
+    return df
 
 if __name__ == "__main__":
     # Fetch data
