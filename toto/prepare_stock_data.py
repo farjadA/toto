@@ -27,6 +27,10 @@ def fetch_sp500_data(lookback_days=700):
         if spy.empty:
             raise ValueError("No data received from Yahoo Finance")
             
+        # Clean up the MultiIndex
+        # First reset the columns to get rid of the MultiIndex
+        spy.columns = [col[0] for col in spy.columns]
+        
         # Calculate additional features
         spy['Returns'] = spy['Close'].pct_change()
         spy['Volume_MA'] = spy['Volume'].rolling(window=24).mean()  # 24-hour moving average
@@ -37,18 +41,31 @@ def fetch_sp500_data(lookback_days=700):
         # Forward fill any NaN values (using newer pandas method)
         spy = spy.ffill()  # Changed from fillna(method='ffill') to ffill()
         
+        # Reset index to make datetime a column
+        spy = spy.reset_index()
+        spy = spy.rename(columns={'index': 'Datetime'})
+        
         # Get the relevant columns
         features = [
-            'Open', 'High', 'Low', 'Close', 
-            'Volume', 'Volume_MA',
-            'Price_MA_short', 'Price_MA_long',
+            'Datetime',
+            'Open', 
+            'High', 
+            'Low', 
+            'Close', 
+            'Volume', 
+            'Volume_MA',
+            'Price_MA_short', 
+            'Price_MA_long',
             'Volatility'
         ]
         
         if spy[features].empty:
             raise ValueError("No data available after processing")
             
-        return spy[features]
+        # Set Datetime as index again but now it's clean
+        spy = spy[features].set_index('Datetime')
+            
+        return spy
         
     except Exception as e:
         print(f"Error fetching S&P 500 data: {str(e)}")
@@ -58,6 +75,14 @@ def prepare_for_toto(data, device='cpu'):
     """
     Prepare the data in the format Toto expects with robust normalization
     """
+    # First, check for any NaN or infinite values in the input data
+    if data.isnull().any().any():
+        # Forward fill, then backward fill any remaining NaNs
+        data = data.ffill().bfill()
+        
+    # Store normalization parameters for later denormalization
+    normalization_params = {}
+    
     # Normalize each feature
     normalized_data = {}
     for column in data.columns:
@@ -66,25 +91,59 @@ def prepare_for_toto(data, device='cpu'):
         # Handle special cases for different features
         if column in ['Volume', 'Volume_MA']:
             # Log transform volume data to handle large numbers
+            # Add small constant to avoid log(0)
             series = np.log1p(series)
         elif column == 'Volatility':
             # Ensure volatility is non-negative
             series = np.maximum(series, 0)
         
-        # Robust normalization
-        q1 = np.percentile(series[~np.isnan(series)], 25)
-        q3 = np.percentile(series[~np.isnan(series)], 75)
-        iqr = q3 - q1
-        
-        if iqr > 0:
-            # Use robust statistics for normalization
-            median = np.median(series[~np.isnan(series)])
-            normalized_data[column] = (series - median) / (iqr + 1e-8)
+        # Robust normalization with additional checks
+        non_nan_mask = ~np.isnan(series)
+        if non_nan_mask.any():  # Only proceed if we have valid data
+            q1 = np.percentile(series[non_nan_mask], 25)
+            q3 = np.percentile(series[non_nan_mask], 75)
+            iqr = q3 - q1
+            
+            if iqr > 0:
+                # Use robust statistics for normalization
+                median = np.median(series[non_nan_mask])
+                normalized_data[column] = (series - median) / (iqr + 1e-8)
+                # Store parameters
+                normalization_params[column] = {
+                    'method': 'robust',
+                    'median': median,
+                    'iqr': iqr,
+                    'transform': 'log1p' if column in ['Volume', 'Volume_MA'] else None
+                }
+            else:
+                # Fallback to simple standardization with safeguards
+                mean = np.mean(series[non_nan_mask])
+                std = np.std(series[non_nan_mask])
+                if std > 0:
+                    normalized_data[column] = (series - mean) / (std + 1e-8)
+                    # Store parameters
+                    normalization_params[column] = {
+                        'method': 'standard',
+                        'mean': mean,
+                        'std': std,
+                        'transform': 'log1p' if column in ['Volume', 'Volume_MA'] else None
+                    }
+                else:
+                    # If std is 0, just center the data
+                    normalized_data[column] = series - mean
+                    # Store parameters
+                    normalization_params[column] = {
+                        'method': 'center',
+                        'mean': mean,
+                        'transform': 'log1p' if column in ['Volume', 'Volume_MA'] else None
+                    }
         else:
-            # Fallback to simple standardization with safeguards
-            mean = np.mean(series[~np.isnan(series)])
-            std = np.std(series[~np.isnan(series)])
-            normalized_data[column] = (series - mean) / (std + 1e-8)
+            # If all values are NaN, set to zeros
+            normalized_data[column] = np.zeros_like(series)
+            normalization_params[column] = {
+                'method': 'zero',
+                'transform': 'log1p' if column in ['Volume', 'Volume_MA'] else None
+            }
         
         # Clip extreme values
         normalized_data[column] = np.clip(normalized_data[column], -10, 10)
@@ -94,10 +153,6 @@ def prepare_for_toto(data, device='cpu'):
         np.array([normalized_data[col] for col in data.columns]),
         dtype=torch.float32
     ).to(device)
-    
-    # Validate tensor for any remaining issues
-    if torch.isnan(series_tensor).any() or torch.isinf(series_tensor).any():
-        raise ValueError("Invalid values detected in normalized data")
     
     # Create timestamp tensor (seconds since start)
     timestamps = pd.to_datetime(data.index)
@@ -119,7 +174,59 @@ def prepare_for_toto(data, device='cpu'):
         time_interval_seconds=time_interval_seconds,
     )
     
-    return masked_series
+    # Final validation
+    if torch.isnan(series_tensor).any() or torch.isinf(series_tensor).any():
+        raise ValueError("Invalid values detected in normalized data")
+    
+    return masked_series, normalization_params
+
+def denormalize_predictions(predictions, normalization_params, column_names):
+    """
+    Convert normalized predictions back to original scale
+    
+    Args:
+        predictions: Tensor of shape [batch, variables, prediction_length] or [batch, variables, prediction_length, samples]
+        normalization_params: Dictionary of normalization parameters for each variable
+        column_names: List of column names in the same order as variables dimension
+    
+    Returns:
+        Denormalized predictions in the same shape as input
+    """
+    # Convert to numpy if tensor
+    if isinstance(predictions, torch.Tensor):
+        predictions = predictions.cpu().numpy()
+    
+    # Handle both point predictions and sample predictions
+    original_shape = predictions.shape
+    if len(original_shape) == 4:
+        # Shape: [batch, variables, prediction_length, samples]
+        predictions = predictions.transpose(0, 3, 1, 2)  # -> [batch, samples, variables, prediction_length]
+        predictions = predictions.reshape(-1, original_shape[1], original_shape[2])  # -> [batch*samples, variables, prediction_length]
+    
+    denormalized = np.zeros_like(predictions)
+    
+    for i, column in enumerate(column_names):
+        params = normalization_params[column]
+        values = predictions[:, i, :]
+        
+        if params['method'] == 'robust':
+            denormalized[:, i, :] = values * (params['iqr'] + 1e-8) + params['median']
+        elif params['method'] == 'standard':
+            denormalized[:, i, :] = values * (params['std'] + 1e-8) + params['mean']
+        elif params['method'] == 'center':
+            denormalized[:, i, :] = values + params['mean']
+        # else method is 'zero', no denormalization needed
+        
+        # Handle inverse transforms
+        if params['transform'] == 'log1p':
+            denormalized[:, i, :] = np.expm1(denormalized[:, i, :])
+    
+    # Restore original shape if needed
+    if len(original_shape) == 4:
+        denormalized = denormalized.reshape(-1, original_shape[3], original_shape[1], original_shape[2])  # -> [batch, samples, variables, prediction_length]
+        denormalized = denormalized.transpose(0, 2, 3, 1)  # -> [batch, variables, prediction_length, samples]
+    
+    return denormalized
 
 if __name__ == "__main__":
     # Fetch data
@@ -127,5 +234,5 @@ if __name__ == "__main__":
     print("Data shape:", data.shape)
     
     # Prepare for Toto
-    toto_input = prepare_for_toto(data)
+    toto_input, normalization_params = prepare_for_toto(data)
     print("Prepared tensor shape:", toto_input.series.shape) 
